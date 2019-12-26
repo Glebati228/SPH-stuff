@@ -9,6 +9,7 @@ public class Manager : MonoBehaviour
 
     private struct SPHParticle
     {
+#pragma warning disable 0649
         public Vector3 position;
         public Vector3 velocity;
         public Vector3 forcePhysic;
@@ -17,6 +18,7 @@ public class Manager : MonoBehaviour
         public float pressure;
         public int parameterID;
         public GameObject go;
+#pragma warning restore 0649
 
         public void Init(Vector3 _position, int _parameterID, GameObject _go)
         {

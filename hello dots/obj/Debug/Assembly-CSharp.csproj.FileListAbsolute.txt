@@ -1,0 +1,2 @@
+C:\Users\HP\Documents\SPH-stuff\hello dots\obj\Debug\Assembly-CSharp.csprojAssemblyReference.cache
+C:\Users\HP\Documents\SPH-stuff\hello dots\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache

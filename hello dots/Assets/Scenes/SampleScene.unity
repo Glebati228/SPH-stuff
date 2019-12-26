@@ -223,6 +223,7 @@ GameObject:
   m_Component:
   - component: {fileID: 117906590}
   - component: {fileID: 117906591}
+  - component: {fileID: 117906592}
   m_Layer: 0
   m_Name: Box
   m_TagString: Untagged
@@ -263,6 +264,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multiplier: 5
+--- !u!114 &117906592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 117906589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f75a2f9f162daf04d935969674cdeed7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &451882311
 GameObject:
   m_ObjectHideFlags: 0
@@ -521,7 +534,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 620149303}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 06ce185c12b4a7e4eb14cc43f1fddb02, type: 3}
   m_Name: 

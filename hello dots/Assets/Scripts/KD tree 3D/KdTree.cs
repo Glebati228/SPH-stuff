@@ -4,35 +4,92 @@ using UnityEngine;
 
 public class KdTree3D<T> where T : Component, IEnumerator<T>
 {
-    private KDCollider3D collider3D;
-    public readonly int N;
 
-    public KdTree3D()
+    private readonly int N;
+
+    private KDNode root;
+    public KDNode Root { get => root; set => root = value; }
+
+    private KDNode last;
+    public KDNode Last { get => last; set => last = value; }
+
+    private int counter;
+
+    public KdTree3D(int N)
     {
-
+        this.N = N;
     }
 
-    public void Add()
+
+    //CRUD
+    /// <summary>
+    /// Add new item
+    /// </summary>
+    /// <param name="item"></param>
+    public void Add(Item<T> item)
     {
+        KDNode node = new KDNode();
+        node.item = item;
 
-    }
-
-    public class KDCollider3D
-    {
-        private Rect up = Rect.zero;
-        private Rect down = Rect.zero;
-
-        public void SetRectVerticies(Rect up, Rect down)
+        if (item == null)
         {
-            this.up = up;
-            this.down = down;
+            return;
+        }
+
+        if (root == null)
+        {
+            root = node;
+            return;
+        }
+        else
+        {
+            KDNode current = root;
+            KDNode parent;
+            while(true)
+            {
+                parent = current;
+                if (true) 
+                {
+                    current = current.left;
+                    if(current == null)
+                    {
+                        parent.left = node;
+                        break;
+                    }
+                }
+                else if (true)
+                {
+                    current = current.right;
+                    if (current == null)
+                    {
+                        parent.right = node;
+                        break;
+                    }
+                }
+            }
+            root = parent;
         }
     }
 
-    public struct Item<T>
+    public void Remove()
     {
-        int[] key;
-        T info;
+
+    }
+
+    public void Delete()
+    {
+
+    }
+
+    public void GetChild()
+    {
+
+    }
+
+    public class Item<T>
+    {
+        public int[] key;
+        public T info;
 
         public Item(int[] key, T info)
         {
@@ -47,11 +104,12 @@ public class KdTree3D<T> where T : Component, IEnumerator<T>
         }
     };
 
-    public struct Node<T>
+    public class KDNode
     {
-        Item<T> i;
-        Node<T> left;
-        Node<T> right;
+        public Item<T> item;
+        public KDNode left { get; set; }
+        public KDNode right { get; set; }
     }
 }
+
 
