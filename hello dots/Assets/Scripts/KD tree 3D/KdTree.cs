@@ -2,113 +2,119 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KdTree3D<T> where T : Component, IEnumerator<T>
+public class KdTree3D<T> where T : Component
 {
+    private Node3D<T> root;
+    public Node3D<T> Root { get => root; set => root = value; }
+    public float threshold;
 
-    private readonly int N;
-
-    private KDNode root;
-    public KDNode Root { get => root; set => root = value; }
-
-    private KDNode last;
-    public KDNode Last { get => last; set => last = value; }
-
-    private int counter;
-
-    public KdTree3D(int N)
+    public Node3D<T> Search(Node3D<T> node, Item3D<T> item)
     {
-        this.N = N;
-    }
-
-
-    //CRUD
-    /// <summary>
-    /// Add new item
-    /// </summary>
-    /// <param name="item"></param>
-    public void Add(Item<T> item)
-    {
-        KDNode node = new KDNode();
-        node.item = item;
-
-        if (item == null)
+        if (node == null || Approximately(node.Item.posKey.magnitude, item.posKey.magnitude))
         {
-            return;
+            return node;
         }
 
-        if (root == null)
+        if (node.Left.Item.posKey.magnitude < item.posKey.magnitude)
         {
-            root = node;
-            return;
+            return Search(node.Left, item);
+        }
+
+        return Search(node.Right, item);
+    }
+
+    public void insert(Node3D<T> node, Item3D<T> item)
+    {
+        root = Insert(node, item);
+    }
+
+    private Node3D<T> Insert(Node3D<T> node, Item3D<T> item)
+    {
+        if(node == null)
+        {
+            node = new Node3D<T>();
+            node.Item = item ?? throw new System.NullReferenceException();
+            return node;
+        }
+        
+        if (item.posKey.magnitude < node.Item.posKey.magnitude)
+        {
+            node = Insert(node.Left, item);
+        }
+        else if (item.posKey.magnitude > node.Item.posKey.magnitude)
+        {
+            node = Insert(node.Right, item);
+        }
+
+        return node;
+    }
+
+    public void remove()
+    {
+
+    }
+
+    private Node3D<T> Remove(Node3D<T> node, Item3D<T> item)
+    {
+        if (node == null)
+        {
+            return node;
+        }
+
+        if (node == null)
+        {
+            return node;
+        }
+
+        if (item.posKey.magnitude < node.Item.posKey.magnitude)
+        {
+            node.Left = Remove(node, item);
+        }
+        else if (item.posKey.magnitude > node.Item.posKey.magnitude)
+        {
+            node.Right = Remove(node, item);
         }
         else
         {
-            KDNode current = root;
-            KDNode parent;
-            while(true)
+            if (node.Left == null)
             {
-                parent = current;
-                if (true) 
-                {
-                    current = current.left;
-                    if(current == null)
-                    {
-                        parent.left = node;
-                        break;
-                    }
-                }
-                else if (true)
-                {
-                    current = current.right;
-                    if (current == null)
-                    {
-                        parent.right = node;
-                        break;
-                    }
-                }
+                return root.Right;
             }
-            root = parent;
-        }
-    }
+            else if (node.Right == null)
+            {
+                return root.Left;
+            }
+            else
+            {
+             //   node.Item = MinValue(node.Right);
 
-    public void Remove()
-    {
-
-    }
-
-    public void Delete()
-    {
-
-    }
-
-    public void GetChild()
-    {
-
-    }
-
-    public class Item<T>
-    {
-        public int[] key;
-        public T info;
-
-        public Item(int[] key, T info)
-        {
-            this.key = key;
-            this.info = info;
+                node.Right = Remove(node.Right, node.Item);
+            }
         }
 
-        public Item(int N, T info)
-        {
-            key = new int[N];
-            this.info = info;
-        }
-    };
+        return root;
+    }
 
-    public class KDNode
+    private bool Approximately(float first, float second)
     {
-        public Item<T> item;
-        public KDNode left { get; set; }
-        public KDNode right { get; set; }
+        return Mathf.Abs(first - second) < this.threshold;    
+    }
+
+    public class Node3D<K> where K : Component
+    {
+        private Item3D<T> item;
+        public Item3D<T> Item { get => item; set => item = value; }
+        private Node3D<T> left;
+        public Node3D<T> Left { get => left; set => left = value; }
+        private Node3D<T> right;
+        public Node3D<T> Right { get => right; set => right = value; }
+    }
+
+    public class Item3D<K> where K : Component
+    {
+        private T item;
+        public T Item { get => item; set => item = value; }
+        public Vector3 posKey;
     }
 }
 

@@ -26,7 +26,7 @@ namespace Trees
         public Node<T> search(Node<T> node, Item<T> key)
         {
             if (node == null || node.item.key == key.key)
-                return root;
+                return node;
 
             if (node.item.key > key.key)
             {
