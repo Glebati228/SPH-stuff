@@ -276,7 +276,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f75a2f9f162daf04d935969674cdeed7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pointsCount: 500
+  pointsCount: 100
   capacity: 2
   rect:
     serializedVersion: 2
@@ -284,6 +284,7 @@ MonoBehaviour:
     y: 0
     width: 200
     height: 200
+  delay: 0
 --- !u!1 &451882311
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -49,10 +49,10 @@ public class QuadTree2D
 
     private bool Contains(Vector2 point)
     {
-        return point.x < boundary.x + boundary.width &&
-               point.x > boundary.x && 
-               point.y < boundary.y + boundary.height && 
-               point.y > boundary.y;   
+        return point.x <= boundary.x + boundary.width &&
+               point.x >= boundary.x && 
+               point.y <= boundary.y + boundary.height && 
+               point.y >= boundary.y;   
     }
 
     private void Subdivide()
@@ -104,9 +104,84 @@ public class QuadTree2D
             Gizmos.DrawLine(sw, nw);
         }
     }
+
+
+    /// <summary>
+    /// returns a point from tree
+    /// </summary>
+    /// <param name="point"></param>
+    /// <returns></returns>
+    public QuadTree2D Find(Vector2 point)
+    {
+        if (!this.Contains(point))
+        {
+            return null;
+        }
+        if (!this.divided)
+        {
+            return this;
+        }
+        QuadTree2D result;
+
+        result = northEast.Find(point);
+        if (!(result is null))
+            return result;
+
+        result = southEast.Find(point);
+        if (!(result is null))
+            return result;
+
+        result = southWest.Find(point);
+        if (!(result is null))
+            return result;
+
+        return northWest.Find(point);
+    }
+
+
+    /// <summary>
+    /// returns all points in a rect
+    /// </summary>
+    /// <param name="rect"></param>
+    /// <returns></returns>
+    public List<Vector2> AreaSearch(Rect rect)
+    {
+        List<Vector2> points = new List<Vector2>();
+        
+        if (!this.boundary.Intersects(rect))
+        {
+            return new List<Vector2>();
+        }
+        else
+        {
+            foreach (var item in this.points)
+            {
+                if (Contains(item))
+                {
+                    points.Add(item);
+                }
+            }
+        }
+
+        if (this.divided)
+        {
+            points = points.Concat(northEast.AreaSearch(rect)).ToList();
+            points = points.Concat(southEast.AreaSearch(rect)).ToList();
+            points = points.Concat(southWest.AreaSearch(rect)).ToList();
+            points = points.Concat(northWest.AreaSearch(rect)).ToList();
+        }
+
+        return points;
+    }
 }
 
 public static class RectTools
 {
-
+    public static bool Intersects(this Rect rect, Rect other)
+    {
+        return   !(other.x - other.width > rect.x + rect.width ||
+                    other.x + rect.width < rect.x - rect.width ||
+                 other.y - other.height > rect.y + rect.height ||
+                  other.y + rect.height < rect.y - rect.height);
+    }
 }

@@ -10,7 +10,7 @@ public class KdTree3D<T> where T : Component
 
     public Node3D<T> Search(Node3D<T> node, Item3D<T> item)
     {
-        if (node == null || Approximately(node.Item.posKey.magnitude, item.posKey.magnitude))
+        if (node == null || Approximately(node.Item.posKey.magnitude, item.posKey.magnitude, this.threshold))
         {
             return node;
         }
@@ -95,9 +95,9 @@ public class KdTree3D<T> where T : Component
         return root;
     }
 
-    private bool Approximately(float first, float second)
+    public static bool Approximately(float first, float second, float threshold)
     {
-        return Mathf.Abs(first - second) < this.threshold;    
+        return Mathf.Abs(first - second) < threshold;    
     }
 
     public class Node3D<K> where K : Component
