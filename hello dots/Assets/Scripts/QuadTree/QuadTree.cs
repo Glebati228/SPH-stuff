@@ -26,7 +26,7 @@ public class QuadTree2D
 
     public void Insert(Vector2 point)
     {
-        if (!Contains(point))
+        if (!this.boundary.Contains(point))
         {
             return;
         }
@@ -47,12 +47,29 @@ public class QuadTree2D
         northWest.Insert(point);
     }
 
-    private bool Contains(Vector2 point)
+    public void InsertF(Vector2 point)
     {
-        return point.x <= boundary.x + boundary.width &&
-               point.x >= boundary.x && 
-               point.y <= boundary.y + boundary.height && 
-               point.y >= boundary.y;   
+        if (!boundary.Contains(point))
+        {
+            return;
+        }
+
+        points.Add(point);
+
+        if (points.Count >= capacity)
+        {
+            if (!this.divided)
+                Subdivide();
+
+            foreach (Vector2 item in points)
+            {
+                northEast.InsertF(item);
+                southEast.InsertF(item);
+                southWest.InsertF(item);
+                northWest.InsertF(item);
+            }
+            points.Clear();
+        }
     }
 
     private void Subdivide()
@@ -91,7 +108,7 @@ public class QuadTree2D
             this.southWest.GraphDebug();
             this.northWest.GraphDebug();
         }
-        else
+        else if(this.points.Count > 0)
         {
             var nw = new Vector3(boundary.x, boundary.y);
             var ne = new Vector3(boundary.x + boundary.width, boundary.y);
@@ -113,7 +130,7 @@ public class QuadTree2D
     /// <returns></returns>
     public QuadTree2D Find(Vector2 point)
     {
-        if (!this.Contains(point))
+        if (!this.boundary.Contains(point))
         {
             return null;
         }
@@ -156,7 +173,7 @@ public class QuadTree2D
         {
             foreach (var item in this.points)
             {
-                if (Contains(item))
+                if (rect.Contains(item))
                 {
                     points.Add(item);
                 }
@@ -173,15 +190,28 @@ public class QuadTree2D
 
         return points;
     }
+
+    public Vector2 FindClosest(Vector2 point)
+    {
+        return Vector2.zero;
+    }
 }
 
 public static class RectTools
 {
     public static bool Intersects(this Rect rect, Rect other)
     {
-        return   !(other.x - other.width > rect.x + rect.width ||
-                    other.x + rect.width < rect.x - rect.width ||
-                 other.y - other.height > rect.y + rect.height ||
-                  other.y + rect.height < rect.y - rect.height);
+        return !(other.x - other.width > rect.x + rect.width ||
+                 other.x + other.width < rect.x - rect.width ||
+                 other.y - other.height > rect.y + other.height ||
+                 other.y + other.height < rect.y - rect.height);
+    }
+
+    public static bool Contains(this Rect rect, Vector2 point)
+    {
+        return point.x <= rect.x + rect.width &&
+               point.x >= rect.x &&
+               point.y <= rect.y + rect.height &&
+               point.y >= rect.y;
     }
 }

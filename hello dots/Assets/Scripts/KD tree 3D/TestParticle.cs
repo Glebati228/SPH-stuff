@@ -29,23 +29,23 @@ public class TestParticle : MonoBehaviour
             float y = UnityEngine.Random.Range(tree.boundary.y, tree.boundary.height);
             Vector2 point = new Vector2(x, y);
             points.Add(point);
-            tree.Insert(point);
+            tree.InsertF(point);
         }
-        tree.AreaSearch(new Rect(50, 50, 50, 50)).ForEach(item => Debug.Log(item));
+        tree.AreaSearch(new Rect(50, 50, 50, 75)).ForEach(item => Debug.Log(item));
     }
 
-    private void OnDrawGizmos()
-    {
-        if (!Application.isPlaying) return;
-        Gizmos.color = Color.blue;
-        tree.GraphDebug();
-        Gizmos.color = Color.red;
-        if (points.Count > 0)
-            foreach (Vector2 item in points)
-            {
-                Gizmos.DrawSphere(item, 1f);
-            }
-    }
+    //private void OnDrawGizmos()
+    //{
+    //    if (!Application.isPlaying) return;
+    //    Gizmos.color = Color.blue;
+    //    tree.GraphDebug();
+    //    Gizmos.color = Color.red;
+    //    if (points.Count > 0)
+    //        foreach (Vector2 item in points)
+    //        {
+    //            Gizmos.DrawSphere(item, 1f);
+    //        }
+    //}
 
     private void Update()
     {
