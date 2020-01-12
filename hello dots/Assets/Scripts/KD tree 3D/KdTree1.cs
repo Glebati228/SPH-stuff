@@ -348,7 +348,7 @@ public class KdTree<T> : IEnumerable<T>, IEnumerable where T : Component
             var splitCurrent = _getSplitValue(current);
             var splitSearch = _getSplitValue(current.level, position);
 
-            if (splitSearch < splitCurrent)
+            if (splitSearch < splitCurrent) 
             {
                 if (current.left != null)
                     _open[openAdd++] = current.left; //go left

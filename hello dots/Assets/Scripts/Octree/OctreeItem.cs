@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ public class OctreeItem : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
+    void Start()  
     {
         previewPos = transform.position;
     }
@@ -47,7 +48,7 @@ public class OctreeItem : MonoBehaviour
 
         foreach (var item in oNodes)
         {
-            item.TryDeleteSubdivision();
+            item.TryDeleteSubdivision(this);
         }
     }
 }

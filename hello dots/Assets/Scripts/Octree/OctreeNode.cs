@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class OctreeNode
@@ -127,30 +128,70 @@ public class OctreeNode
         items.Clear();
     }
 
-    public void TryDeleteSubdivision()
+    public void TryDeleteSubdivision(OctreeItem item)
     {
-        if(ReferenceEquals(this, Root))
+        if(!ReferenceEquals(this, Root) && !DeleteItems())
         {
-            return;
-        }
-        items.Clear();
-        if(!ReferenceEquals(Childs[0], null))
-        {
-            foreach (var item in Childs)
+            foreach (var child in parent.Childs)
             {
-                item.TryDeleteSubdivision();
+                child.RemoveNode(parent.Childs.Where(i => !ReferenceEquals(i, this)).ToArray());
             }
+            parent.EraseChildNodes();
         }
+        else
+        {
+            items.Remove(item);
+            item.nodes.Remove(this);
+        }
+    }
+
+    private void RemoveNode(OctreeNode[] childs)
+    {
+        items.ForEach(listItem => {
+            listItem.nodes = listItem.nodes.Except(childs).ToList();
+            listItem.nodes.Remove(this);
+            listItem.nodes.Add(parent);
+            parent.items.Add(listItem);
+        });
+
+        GameObject.Destroy(this.GO);
+    }
+
+    private void EraseChildNodes()
+    {
+        childs = new OctreeNode[CHILDS_COUNT];   
+    }
+
+    private bool DeleteItems()
+    {
+        List<OctreeItem> legacy_items = new List<OctreeItem>();
+        foreach (var item in Parent.Childs)
+        {
+            if(!ReferenceEquals(item.Childs[0], null))
+            {
+                return true;
+            }
+            legacy_items.AddRange(item.items.Where(c => !legacy_items.Contains(c)));
+        }
+
+        if(legacy_items.Count > capacity + 1)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public bool Contains(Vector3 item)
     {
-        return (item.x < center.x + halfDimension &&
-                item.x > center.x - halfDimension &&
-                item.y < center.y + halfDimension &&
-                item.y > center.y - halfDimension &&
-                item.z < center.z + halfDimension &&
-                item.z > center.z - halfDimension);
+        if (item.x > center.x + halfDimension || item.x < center.x - halfDimension)
+            return false;
+        if (item.y > center.y + halfDimension || item.y < center.y - halfDimension)
+            return false;
+        if (item.z > center.z + halfDimension || item.z < center.z - halfDimension)
+            return false;
+
+        return true;
     }
 
     [RuntimeInitializeOnLoadMethod]

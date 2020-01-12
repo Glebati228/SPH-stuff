@@ -2,84 +2,69 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Trees;
+using System;
 
 public class TestParticle : MonoBehaviour
 {
-    BinaryTree<Transform> binaryTree = new BinaryTree<Transform>();
 #pragma warning disable 0649
-    [Header("Quad Tree props:")]
-    [SerializeField] private int pointsCount;
-    [SerializeField] private int capacity;
-    [SerializeField] private Rect rect;
-    [SerializeField] private float delay;
-    private QuadTree2D tree;
-
-    private List<Vector2> points;
+    [SerializeField] private float                      maxSize;
+    [SerializeField] private float                      minSize;
+    [SerializeField] private int                        pointsCount;
+    [SerializeField] private GameObject                 cubePrefab;
+    [SerializeField, Range(0f, 10f)] private float      updateRate;
+    private PointOctree<GameObject>                     pointOctree;
+    private GameObject[]                                items;
+    private float                                       timer;
 #pragma warning restore 0649
-    private float timer = default;
 
     private void Start()
     {
-        points = new List<Vector2>();
+        items = new GameObject[pointsCount];
+        pointOctree = new PointOctree<GameObject>(maxSize, transform.position, minSize);
 
-        tree = new QuadTree2D(rect, capacity);
         for (int i = 0; i < pointsCount; i++)
         {
-            float x = UnityEngine.Random.Range(tree.boundary.x, tree.boundary.width);
-            float y = UnityEngine.Random.Range(tree.boundary.y, tree.boundary.height);
-            Vector2 point = new Vector2(x, y);
-            points.Add(point);
-            tree.InsertF(point);
+            Vector3 pos = new Vector3(
+                    UnityEngine.Random.Range(transform.position.x - maxSize, transform.position.x + maxSize),
+                    UnityEngine.Random.Range(transform.position.y - maxSize, transform.position.y + maxSize),
+                    UnityEngine.Random.Range(transform.position.z - maxSize, transform.position.z + maxSize));
+            items[i] = Instantiate(cubePrefab, pos, Quaternion.identity) as GameObject;
+            items[i].name = i.ToString();
+            pointOctree.Add(items[i], pos);
         }
-        tree.AreaSearch(new Rect(50, 50, 50, 75)).ForEach(item => Debug.Log(item));
     }
 
-    //private void OnDrawGizmos()
-    //{
-    //    if (!Application.isPlaying) return;
-    //    Gizmos.color = Color.blue;
-    //    tree.GraphDebug();
-    //    Gizmos.color = Color.red;
-    //    if (points.Count > 0)
-    //        foreach (Vector2 item in points)
-    //        {
-    //            Gizmos.DrawSphere(item, 1f);
-    //        }
-    //}
+    void OnDrawGizmos()
+    {
+        if (!Application.isPlaying && pointOctree is null) return;
+
+        pointOctree.DrawAllBounds();
+        pointOctree.DrawAllObjects();
+    }
 
     private void Update()
     {
-        ChangePoints();
+        UpdateTree();
     }
 
-    private void ChangePoints()
+    private void UpdateTree()
     {
         timer += Time.deltaTime;
-        if (delay > 0f && timer >= delay)
+        if (timer >= updateRate)
         {
             timer = 0f;
-            points.Clear();
-            tree = new QuadTree2D(rect, capacity);
+            pointOctree.ClearTree();
+
             for (int i = 0; i < pointsCount; i++)
             {
-                float x = UnityEngine.Random.Range(tree.boundary.x, tree.boundary.width);
-                float y = UnityEngine.Random.Range(tree.boundary.y, tree.boundary.height);
-                Vector2 point = new Vector2(x, y);
-                points.Add(point);
-                tree.Insert(point);
+                Vector3 pos = new Vector3(
+                        UnityEngine.Random.Range(transform.position.x - maxSize, transform.position.x + maxSize),
+                        UnityEngine.Random.Range(transform.position.y - maxSize, transform.position.y + maxSize),
+                        UnityEngine.Random.Range(transform.position.z - maxSize, transform.position.z + maxSize));
+                items[i].transform.position = pos;
+                pointOctree.Add(items[i], pos);
             }
         }
     }
-
-    //for comparison with a tree
-    private Vector2 BadSearch(Vector2 first)
-    {
-        for (int i = 0; i < points.Count; i++)
-        {
-            if (Mathf.Abs((first - points[i]).magnitude) < 0.01f)
-                return points[i];
-        }
-
-        return Vector2.zero;
-    }
 }
+
